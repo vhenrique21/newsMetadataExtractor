@@ -1,0 +1,23 @@
+{
+  "author": {
+    "classNames": ["author", "byline", "from"],
+    "delimiters": [" and ", ", ", " & "],
+    "prefixes": ["by", "edited by"]
+  },
+  "copyright": {
+    "classNames": ["copyright"],
+    "prefix": ["© "],
+    "suffixes": [
+      "all rights reserved",
+      "todos os direitos reservados",
+      "copyright",
+      "©"
+    ]
+  },
+  "datetime": {
+    "classNames": ["timestamp", "date", "time", "publish_date"],
+    "dayFirst": false,
+    "timezone": "America/New_York"
+  },
+  "language": "en-US"
+}
