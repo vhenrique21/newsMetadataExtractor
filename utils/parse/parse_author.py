@@ -1,29 +1,27 @@
 import re
 
+from models.template import TemplateModel
 from utils import contains
 from utils.parse.parse_date import parse_date
 
-SEPARATORS = [" and ", ", ", " & ", " e "]
-PREFIXES = ["by", "edited by", "por", "di", "dal"]
 
-
-def parse_author(input: list[str] | str) -> list[str]:
+def parse_author(input: list[str] | str, template: TemplateModel) -> list[str]:
     if type(input) == str:
-        authors: list[str] = _parse_name(input)
+        authors: list[str] = _parse_name(input, template)
         return _remove_duplicates(authors)
 
     input = list(dict.fromkeys(input))
-    input = [i for i in input if not parse_date(i)]
+    input = [i for i in input if not parse_date(i, template)]
 
-    string_without_prefix: str = _parse_prefix(input)
+    string_without_prefix: str = _parse_prefix(input, template)
 
-    authors: list[str] = _parse_name(string_without_prefix)
+    authors: list[str] = _parse_name(string_without_prefix, template)
     return _remove_duplicates(authors)
 
 
-def _parse_prefix(input: list[str]):
+def _parse_prefix(input: list[str], template: TemplateModel) -> str:
     for idx, text in enumerate(input):
-        for prefix in PREFIXES:
+        for prefix in template.author.prefixes:
             if text.lower().startswith(prefix):
                 text = re.sub(r"^" + prefix, "", text, flags=re.IGNORECASE)
                 if text.strip() == "":
@@ -34,8 +32,8 @@ def _parse_prefix(input: list[str]):
     return ", ".join(input)
 
 
-def _parse_name(input: str) -> list[str]:
-    regex = "|".join(SEPARATORS)
+def _parse_name(input: str, template: TemplateModel) -> list[str]:
+    regex = "|".join(template.author.delimiters)
     authors: list[str] = re.split(regex, input)
     return [a.strip() for a in authors if a.strip() != ""]
 

@@ -2,38 +2,31 @@ import re
 
 from bs4 import Tag
 
-from models import TagContent
-from models.extract_model import DatetimeExtractModel
+from models import DatetimeExtractModel, TagContent, TemplateModel
 from modules.extractors import BaseExtractor
 from modules.extractors.meta import MetaTagExtractor, OpenGraphExtractor
 from modules.parser import Parser
-from utils import DateTargetTags, extract_by_class, extract_from_extractor, flatten
+from utils import TargetTags, extract_by_class, extract_from_extractor, flatten
 from utils.parse.parse_date import parse_date, parse_dates
 
-date_target_tags: list[DateTargetTags] = [
+date_target_tags: list[TargetTags] = [
     "publication_date",
     "publish_date",
     "published_time",
 ]
 
 
-class_list: list[str] = [
-    "updated",
-    "date",
-    "data",
-    "time",
-    "published-date",
-    "timestamp",
-    "datetime",
-    "date-published",
-]
-
-
 class DatetimeExtractor(BaseExtractor):
-    def __init__(self, parser: Parser, title: TagContent, subtitle: TagContent):
+    def __init__(
+        self,
+        parser: Parser,
+        template: TemplateModel,
+        title: TagContent,
+        subtitle: TagContent,
+    ):
         self._title: TagContent = title  # type: ignore
         self._subtitle: TagContent = subtitle  # type: ignore
-        super().__init__(parser)
+        super().__init__(parser, template)
 
     def _extract_time_tag(self) -> list[str]:
         datetime: list[str] = [
@@ -44,7 +37,12 @@ class DatetimeExtractor(BaseExtractor):
 
     def _extract_by_class(self) -> list[str]:
         return flatten(
-            [d.split("|") for d in extract_by_class(self._parser, class_list)]
+            [
+                d.split("|")
+                for d in extract_by_class(
+                    self._parser, self._template.datetime.class_names
+                )
+            ]
         )
 
     def _extract_from_url(self) -> str:
@@ -61,20 +59,24 @@ class DatetimeExtractor(BaseExtractor):
         return ""
 
     def _extract_meta(self) -> str:
-        return extract_from_extractor(MetaTagExtractor(self._parser), date_target_tags)
+        return extract_from_extractor(
+            MetaTagExtractor(self._parser, self._template), date_target_tags
+        )
 
     def _extract_open_graph(self) -> str:
         return extract_from_extractor(
-            OpenGraphExtractor(self._parser), date_target_tags
+            OpenGraphExtractor(self._parser, self._template), date_target_tags
         )
 
     def _extract(self) -> DatetimeExtractModel:
         return {
-            "class_name": parse_dates(self._extract_by_class()),
-            "time": (lambda x: parse_dates(x) or x)(self._extract_time_tag()),
-            "url": parse_date(self._extract_from_url()),
-            "meta": parse_date(self._extract_meta()),
-            "og": parse_date(self._extract_open_graph()),
+            "class_name": parse_dates(self._extract_by_class(), self._template),
+            "time": (lambda x: parse_dates(x, self._template) or x)(
+                self._extract_time_tag()
+            ),
+            "url": parse_date(self._extract_from_url(), self._template),
+            "meta": parse_date(self._extract_meta(), self._template),
+            "og": parse_date(self._extract_open_graph(), self._template),
         }
 
     def extract(self) -> list[TagContent]:

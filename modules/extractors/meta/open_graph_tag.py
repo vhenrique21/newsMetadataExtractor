@@ -1,3 +1,4 @@
+from models import TemplateModel
 from modules.extractors import BaseExtractor, TagContent
 from modules.parser import Parser
 
@@ -6,8 +7,8 @@ class OpenGraphExtractor(BaseExtractor):
     target_field: str = "property"
     attrs: dict[str, bool] = {target_field: True}
 
-    def __init__(self, parser: Parser):
-        super().__init__(parser)
+    def __init__(self, parser: Parser, template: TemplateModel):
+        super().__init__(parser, template)
 
     def _filter_tags(self, tags: list[dict[str, str]]) -> list[dict[str, str]]:
         return [tag for tag in tags if tag[self.target_field].startswith("og:")]

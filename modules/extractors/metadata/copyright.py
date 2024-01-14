@@ -1,6 +1,6 @@
 from bs4 import ResultSet, Tag
 
-from models.tag_content import TagContent
+from models import TagContent, TemplateModel
 from modules.extractors.base import BaseExtractor
 from modules.parser import Parser
 from utils import contains, flatten
@@ -15,8 +15,8 @@ class_list: list[str] = ["copyright"]
 
 
 class CopyrightExtractor(BaseExtractor):
-    def __init__(self, parser: Parser):
-        super().__init__(parser)
+    def __init__(self, parser: Parser, template: TemplateModel):
+        super().__init__(parser, template)
 
     def _extract_by_content(self):
         tags: ResultSet[Tag] = self._parser.find_all(

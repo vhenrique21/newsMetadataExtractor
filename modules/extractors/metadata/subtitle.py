@@ -1,6 +1,7 @@
 from bs4 import ResultSet, Tag
 
 from models import SubtitleExtractModel, TagContent
+from models.template import TemplateModel
 from modules.extractors import BaseExtractor
 from modules.extractors.meta import MetaTagExtractor, OpenGraphExtractor
 from modules.parser import Parser
@@ -14,9 +15,9 @@ from utils import (
 
 
 class SubtitleExtractor(BaseExtractor):
-    def __init__(self, parser: Parser, title: TagContent):
+    def __init__(self, parser: Parser, template: TemplateModel, title: TagContent):
         self._title: TagContent = title  # type: ignore
-        super().__init__(parser)
+        super().__init__(parser, template)
 
     def _extract_h2(self) -> list[str]:
         return extract_by_tag(self._parser, "h2")
@@ -33,10 +34,14 @@ class SubtitleExtractor(BaseExtractor):
         return extract_tag_text(siblings[0]) if len(siblings) else []
 
     def _extract_meta(self) -> str:
-        return extract_from_extractor(MetaTagExtractor(self._parser), "description")
+        return extract_from_extractor(
+            MetaTagExtractor(self._parser, self._template), "description"
+        )
 
     def _extract_open_graph(self) -> str:
-        return extract_from_extractor(OpenGraphExtractor(self._parser), "description")
+        return extract_from_extractor(
+            OpenGraphExtractor(self._parser, self._template), "description"
+        )
 
     def _extract(self) -> SubtitleExtractModel:
         return {

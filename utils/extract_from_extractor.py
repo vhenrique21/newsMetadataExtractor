@@ -2,6 +2,9 @@ from typing import Literal, Union
 
 from models import TagContent
 from modules.extractors import BaseExtractor
+from utils import flatten
+from utils.is_null_or_empty import is_null_or_empty
+from utils.to_list import to_list
 
 TargetMetaTags = Literal[
     "title",
@@ -25,18 +28,24 @@ TargetOpenGraphTags = Literal[
     "published_time",
 ]
 
-DateTargetTags = Union[TargetMetaTags, TargetOpenGraphTags]
+TargetTags = Union[TargetMetaTags, TargetOpenGraphTags]
 
 
 def extract_from_extractor(
-    extractor: BaseExtractor, target_tag: DateTargetTags | list[DateTargetTags]
+    extractor: BaseExtractor, target_tag: TargetTags | list[TargetTags]
 ) -> str:
     if type(target_tag) == str:
         target_tag = [target_tag]
 
-    tags = extractor.extract()
+    tags: list[TagContent] = extractor.extract()
 
-    title_tags: list[TagContent] = [tag for tag in tags if tag["name"] in target_tag]
-    title_tags = [tag for tag in title_tags if tag["value"].strip() != ""]
+    filtered_tags: list[TagContent] = [
+        tag
+        for tag in tags
+        if ((tag["name"] in target_tag) and (is_null_or_empty(tag["value"]) is False))
+    ]
 
-    return title_tags[0]["value"] if len(title_tags) > 0 else ""
+    collection: list[list[str]] = [to_list(tag["value"]) for tag in filtered_tags]
+    items: list[str] = flatten(collection)
+
+    return ", ".join(items)
