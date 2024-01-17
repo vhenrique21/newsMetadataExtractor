@@ -1,0 +1,48 @@
+{
+  "author": {
+    "classNames": [
+      "author",
+      "autor",
+      "byline",
+      "dc.creator",
+      "byl",
+      "creator",
+      "criador",
+      "from"
+    ],
+    "delimiters": [" e ", ", ", " & "],
+    "prefixes": ["por", "editado por", "escrito por", "de"]
+  },
+  "copyright": {
+    "classNames": ["copyright"],
+    "prefixes": ["© "],
+    "suffixes": ["todos os direitos reservados", "copyright", "©"]
+  },
+  "datetime": {
+    "classNames": [
+      "data",
+      "time",
+      "published-date",
+      "datePublished",
+      "dataPublicacao",
+      "timestamp",
+      "datetime",
+      "date-published"
+    ],
+    "dayFirst": false,
+    "delimiters": [" às ", " as ", " @", "atualizado", "atualizado às"],
+    "prefixes": [
+      "publicado",
+      "publicado em",
+      "atualizado",
+      "atualizado em",
+      "criado às",
+      "modificado às",
+      "data"
+    ]
+  },
+  "language": {
+    "code": "pt",
+    "complete_code": "pt-br"
+  }
+}
