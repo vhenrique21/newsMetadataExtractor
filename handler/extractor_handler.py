@@ -41,6 +41,7 @@ class ExtractorHandler(BaseHandler[list[TagContent]]):
         authors = AuthorsExtractor(
             self._parser, self._template, title[0], subtitle[0]
         ).extract()
+
         datetime = DatetimeExtractor(
             self._parser, self._template, title[0], subtitle[0]
         ).extract()
