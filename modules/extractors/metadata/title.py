@@ -1,4 +1,4 @@
-from models import TagContent, TitleExtractModel
+from models import TagContent, TemplateModel, TitleExtractModel
 from modules.extractors import BaseExtractor
 from modules.extractors.meta import MetaTagExtractor, OpenGraphExtractor
 from modules.parser import Parser
@@ -6,8 +6,8 @@ from utils import contains_exact, extract_by_tag, extract_from_extractor, is_sub
 
 
 class TitleExtractor(BaseExtractor):
-    def __init__(self, parser: Parser):
-        super().__init__(parser)
+    def __init__(self, parser: Parser, template: TemplateModel):
+        super().__init__(parser, template)
 
     def _extract_title_tag(self) -> str:
         head = self._parser.head
@@ -18,10 +18,14 @@ class TitleExtractor(BaseExtractor):
         return extract_by_tag(self._parser, "h1")
 
     def _extract_meta(self) -> str:
-        return extract_from_extractor(MetaTagExtractor(self._parser), "title")
+        return extract_from_extractor(
+            MetaTagExtractor(self._parser, self._template), "title"
+        )
 
     def _extract_open_graph(self) -> str:
-        return extract_from_extractor(OpenGraphExtractor(self._parser), "title")
+        return extract_from_extractor(
+            OpenGraphExtractor(self._parser, self._template), "title"
+        )
 
     def _extract(self) -> TitleExtractModel:
         return {

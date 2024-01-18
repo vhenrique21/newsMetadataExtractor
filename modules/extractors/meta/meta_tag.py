@@ -1,3 +1,4 @@
+from models import TemplateModel
 from modules.extractors import BaseExtractor, TagContent
 from modules.parser import Parser
 
@@ -6,8 +7,8 @@ class MetaTagExtractor(BaseExtractor):
     target_field: str = "name"
     attrs: dict[str, bool] = {target_field: True}
 
-    def __init__(self, parser: Parser):
-        super().__init__(parser)
+    def __init__(self, parser: Parser, template: TemplateModel):
+        super().__init__(parser, template)
 
     def _extract_tags(self, results: list[dict[str, str]]) -> list[TagContent]:
         return [

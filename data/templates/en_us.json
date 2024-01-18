@@ -1,0 +1,37 @@
+{
+  "author": {
+    "classNames": ["author", "byline", "dc.creator", "byl", "creator", "from"],
+    "delimiters": [" and ", ", ", " & "],
+    "prefixes": ["by", "edited by"]
+  },
+  "copyright": {
+    "classNames": ["copyright"],
+    "prefixes": ["© "],
+    "suffixes": ["all rights reserved", "copyright", "©"]
+  },
+  "datetime": {
+    "classNames": [
+      "updated",
+      "date",
+      "time",
+      "published-date",
+      "timestamp",
+      "datetime",
+      "date-published"
+    ],
+    "dayFirst": false,
+    "delimiters": [" at ", " on ", " @", "updated", "updated at"],
+    "prefixes": [
+      "published",
+      "posted",
+      "updated",
+      "created",
+      "modified",
+      "date"
+    ]
+  },
+  "language": {
+    "code": "en",
+    "complete_code": "en-us"
+  }
+}

@@ -1,33 +1,33 @@
 from bs4 import ResultSet, Tag
 
-from models import AuthorExtractModel, TagContent
-from modules.extractors import BaseExtractor
-from modules.extractors.meta import MetaTagExtractor
+from models import AuthorExtractModel, TagContent, TemplateModel
+from modules.extractors import BaseExtractor, MetaTagExtractor
 from modules.parser import Parser
 from utils import extract_from_extractor, flatten, parse_author
 
 
 class AuthorsExtractor(BaseExtractor):
-    def __init__(self, parser: Parser, title: TagContent, subtitle: TagContent):
+    def __init__(
+        self,
+        parser: Parser,
+        template: TemplateModel,
+        title: TagContent,
+        subtitle: TagContent,
+    ):
         self._title: TagContent = title  # type: ignore
         self._subtitle: TagContent = subtitle  # type: ignore
-        super().__init__(parser)
+        super().__init__(parser, template)
 
     def _extract_meta(self) -> str:
-        return extract_from_extractor(MetaTagExtractor(self._parser), "author")
+        return extract_from_extractor(
+            MetaTagExtractor(self._parser, self._template), "author"
+        )
 
     def _extract_by_class(self) -> list[str]:
-        class_list: list[str] = [
-            "author",
-            "byline",
-            "dc.creator",
-            "byl",
-            "creator",
-            "from",
-        ]
-
         tags: ResultSet[Tag] = self._parser.find_all(
-            class_=lambda x: x and (any(v in x.lower() for v in class_list)) or False
+            class_=lambda x: x
+            and (any(v in x.lower() for v in self._template.author.class_names))
+            or False
         )
 
         values: list[str] = flatten(
@@ -38,8 +38,8 @@ class AuthorsExtractor(BaseExtractor):
 
     def _extract(self) -> AuthorExtractModel:
         return {
-            "class_name": parse_author(self._extract_by_class()),
-            "meta": parse_author(self._extract_meta()),
+            "class_name": parse_author(self._extract_by_class(), self._template),
+            "meta": parse_author(self._extract_meta(), self._template),
         }
 
     def extract(self) -> list[TagContent]:
